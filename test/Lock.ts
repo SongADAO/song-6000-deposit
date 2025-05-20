@@ -19,7 +19,7 @@ describe("Lock", function () {
     // Contracts are deployed using the first signer/account by default
     const [owner, otherAccount] = await hre.viem.getWalletClients();
 
-    const lock = await hre.viem.deployContract("Lock", [unlockTime], {
+    const lock = await hre.viem.deployContract("Lock", [getAddress(owner.account.address), unlockTime], {
       value: lockedAmount,
     });
 
@@ -63,10 +63,12 @@ describe("Lock", function () {
     });
 
     it("Should fail if the unlockTime is not in the future", async function () {
+      const [owner, otherAccount] = await hre.viem.getWalletClients();
+
       // We don't use the fixture here because we want a different deployment
       const latestTime = BigInt(await time.latest());
       await expect(
-        hre.viem.deployContract("Lock", [latestTime], {
+        hre.viem.deployContract("Lock", [getAddress(owner.account.address), latestTime], {
           value: 1n,
         })
       ).to.be.rejectedWith("Unlock time should be in the future");
