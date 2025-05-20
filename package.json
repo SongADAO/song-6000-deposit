@@ -4,11 +4,11 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "deploy-arbitrum": "hardhat ignition deploy ./ignition/modules/Lock.ts --network arbitrum",
     "deploy-base": "hardhat ignition deploy ./ignition/modules/Lock.ts --network base",
-    "deploy-baseSepolia": "hardhat ignition deploy ./ignition/modules/Lock.ts --network baseSepolia",
+    "deploy-baseSepolia": "hardhat ignition deploy ./ignition/modules/Lock.ts --network baseSepolia --verify",
     "deploy-localhost": "hardhat ignition deploy ./ignition/modules/Lock.ts --network localhost",
     "deploy-mainnet": "hardhat ignition deploy ./ignition/modules/Lock.ts --network mainnet",
     "deploy-optimism": "hardhat ignition deploy ./ignition/modules/Lock.ts --network optimism",
-    "deploy-sepolia": "hardhat ignition deploy ./ignition/modules/Lock.ts --network sepolia"
+    "deploy-sepolia": "hardhat ignition deploy ./ignition/modules/Lock.ts --network sepolia --verify"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox-viem": "^3.0.0",

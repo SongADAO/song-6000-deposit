@@ -18,8 +18,8 @@ npx hardhat ignition deploy ./ignition/modules/Lock.ts
 
 ## Contracts - Testnet
 
-* Sepolia: 0x0F2CCaae244a12ccDd08191712e8e38A4dC14f8E
-* Base Sepolia: 0x0F2CCaae244a12ccDd08191712e8e38A4dC14f8E
+* Sepolia: 0xd8f54B0db6280C424fC36daBc08D5ad0891AeD1A
+* Base Sepolia: 0xd8f54B0db6280C424fC36daBc08D5ad0891AeD1A
 
 ## Contracts - Production
 
