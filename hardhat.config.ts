@@ -28,17 +28,17 @@ const config: HardhatUserConfig = {
     arbitrum: {
       accounts: [process.env.MAINNET_PRIVATE_KEY ?? ''],
       from: process.env.MAINNET_FROM, // want this contract owner
-      url: process.env.MAINNET_URL,
+      url: process.env.ARBITRUM_SEPOLIA_URL,
     },
     optimism: {
       accounts: [process.env.MAINNET_PRIVATE_KEY ?? ''],
       from: process.env.MAINNET_FROM, // want this contract owner
-      url: process.env.MAINNET_URL,
+      url: process.env.OPTIMISM_SEPOLIA_URL,
     },
     base: {
       accounts: [process.env.MAINNET_PRIVATE_KEY ?? ''],
       from: process.env.MAINNET_FROM, // want this contract owner
-      url: process.env.MAINNET_URL,
+      url: process.env.BASE_URL,
     },
     sepolia: {
       accounts: [process.env.SEPOLIA_PRIVATE_KEY ?? ''],
@@ -48,7 +48,7 @@ const config: HardhatUserConfig = {
     baseSepolia: {
       accounts: [process.env.SEPOLIA_PRIVATE_KEY ?? ''],
       from: process.env.SEPOLIA_FROM, // want this contract owner
-      url: process.env.SEPOLIA_URL,
+      url: process.env.BASE_SEPOLIA_URL,
     },
   },
   solidity: {
