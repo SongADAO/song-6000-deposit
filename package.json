@@ -2,12 +2,13 @@
   "name": "song-6000-deposit",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "deploy-localhost": "hardhat ignition deploy ./ignition/modules/Lock.ts --network localhost",
-    "deploy-sepolia": "hardhat ignition deploy ./ignition/modules/Lock.ts --network sepolia",
+    "deploy-arbitrum": "hardhat ignition deploy ./ignition/modules/Lock.ts --network arbitrum",
+    "deploy-base": "hardhat ignition deploy ./ignition/modules/Lock.ts --network base",
     "deploy-baseSepolia": "hardhat ignition deploy ./ignition/modules/Lock.ts --network baseSepolia",
+    "deploy-localhost": "hardhat ignition deploy ./ignition/modules/Lock.ts --network localhost",
     "deploy-mainnet": "hardhat ignition deploy ./ignition/modules/Lock.ts --network mainnet",
-    "verify-sepolia": "hardhat ignition deploy ./ignition/modules/Lock.ts --network sepolia --verify",
-    "verify-mainnet": "hardhat ignition deploy ./ignition/modules/Lock.ts --network mainnet --verify"
+    "deploy-optimism": "hardhat ignition deploy ./ignition/modules/Lock.ts --network optimism",
+    "deploy-sepolia": "hardhat ignition deploy ./ignition/modules/Lock.ts --network sepolia"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox-viem": "^3.0.0",

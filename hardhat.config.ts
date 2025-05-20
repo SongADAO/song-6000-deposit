@@ -6,10 +6,27 @@ dotenv.config();
 
 const config: HardhatUserConfig = {
   etherscan: {
-    apiKey: process.env.ETHERSCAN_API_KEY,
+    apiKey: {
+      arbitrum: process.env.ETHERSCAN_API_KEY ?? '',
+      base: process.env.ETHERSCAN_API_KEY ?? '',
+      baseSepolia: process.env.BASE_ETHERSCAN_API_KEY ?? '',
+      mainnet: process.env.ETHERSCAN_API_KEY ?? '',
+      optimism: process.env.ETHERSCAN_API_KEY ?? '',
+      sepolia: process.env.ETHERSCAN_API_KEY ?? '',
+    },
+    customChains: [
+      {
+        network: "baseSepolia",
+        chainId: 84532,
+        urls: {
+          apiURL: "https://api-sepolia.basescan.org/api",
+          browserURL: "https://sepolia.basescan.org"
+        }
+      }
+    ]
   },
   gasReporter: {
-    coinmarketcap: process.env.COINMARKETCAP_API_KEY || "",
+    coinmarketcap: process.env.COINMARKETCAP_API_KEY ?? '',
     currency: "USD",
     enabled: process.env.REPORT_GAS !== undefined,
     gasPrice: 3,
