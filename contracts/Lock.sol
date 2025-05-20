@@ -5,6 +5,8 @@ contract Lock {
     uint public unlockTime;
     address payable public owner;
 
+    event Received(address sender, uint amount);
+
     event Withdrawal(uint amount, uint when);
 
     constructor(address _owner, uint _unlockTime) payable {
@@ -19,6 +21,10 @@ contract Lock {
 
         unlockTime = _unlockTime;
         owner = payable(_owner);
+    }
+
+    receive() external payable {
+        emit Received(msg.sender, msg.value);
     }
 
     function withdraw() public {

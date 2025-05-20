@@ -251,4 +251,163 @@ describe("Lock", function () {
       });
     });
   });
+
+  describe("Receive function", function () {
+    it("Should emit Received event when contract receives Ether", async function () {
+      const { lock, otherAccount, publicClient } = await loadFixture(
+        deployOneYearLockFixture
+      );
+
+      // Send ETH directly to the contract
+      const amount = parseGwei("0.5");
+      const hash = await otherAccount.sendTransaction({
+        to: lock.address,
+        value: amount,
+      });
+      await publicClient.waitForTransactionReceipt({ hash });
+
+      // Verify that the Received event was emitted
+      const receivedEvents = await lock.getEvents.Received();
+      expect(receivedEvents).to.have.lengthOf(1);
+      expect(receivedEvents[0].args.sender).to.equal(
+        getAddress(otherAccount.account.address)
+      );
+      expect(receivedEvents[0].args.amount).to.equal(amount);
+    });
+
+    it("Should increase contract balance when receiving Ether", async function () {
+      const { lock, otherAccount, publicClient, lockedAmount } = await loadFixture(
+        deployOneYearLockFixture
+      );
+
+      // Get the initial balance
+      const initialBalance = await publicClient.getBalance({
+        address: lock.address,
+      });
+
+      // Send ETH directly to the contract
+      const amount = parseGwei("0.5");
+      const hash = await otherAccount.sendTransaction({
+        to: lock.address,
+        value: amount,
+      });
+      await publicClient.waitForTransactionReceipt({ hash });
+
+      // Check that the balance increased by the correct amount
+      const newBalance = await publicClient.getBalance({
+        address: lock.address,
+      });
+      expect(newBalance).to.equal(initialBalance + amount);
+    });
+
+    it("Should allow receiving Ether from multiple accounts", async function () {
+      const { lock, owner, otherAccount, publicClient } = await loadFixture(
+        deployOneYearLockFixture
+      );
+
+      // Get the initial balance
+      const initialBalance = await publicClient.getBalance({
+        address: lock.address,
+      });
+
+      // Send ETH from multiple accounts
+      const amount1 = parseGwei("0.3");
+      const hash1 = await owner.sendTransaction({
+        to: lock.address,
+        value: amount1,
+      });
+      await publicClient.waitForTransactionReceipt({ hash: hash1 });
+
+      // Check events
+      const receivedEvents1 = await lock.getEvents.Received();
+      expect(receivedEvents1).to.have.lengthOf(1);
+
+      // Verify both events have correct data
+      const ownerEvent1 = receivedEvents1.find(
+        event => event.args.sender === getAddress(owner.account.address)
+      );
+
+      expect(ownerEvent1).to.not.be.undefined;
+      expect(ownerEvent1?.args.amount).to.equal(amount1);
+
+      const amount2 = parseGwei("0.7");
+      const hash2 = await otherAccount.sendTransaction({
+        to: lock.address,
+        value: amount2,
+      });
+      await publicClient.waitForTransactionReceipt({ hash: hash2 });
+
+      // Check events
+      const receivedEvents2 = await lock.getEvents.Received();
+      expect(receivedEvents2).to.have.lengthOf(1);
+
+      // Verify both events have correct data
+      const ownerEvent2 = receivedEvents2.find(
+        event => event.args.sender === getAddress(otherAccount.account.address)
+      );
+
+      expect(ownerEvent2).to.not.be.undefined;
+      expect(ownerEvent2?.args.amount).to.equal(amount2);
+
+      // Check that the balance increased by the correct total amount
+      const newBalance = await publicClient.getBalance({
+        address: lock.address,
+      });
+      expect(newBalance).to.equal(initialBalance + amount1 + amount2);
+    });
+
+    it("Should work with withdraw function", async function () {
+      const { lock, unlockTime, owner, otherAccount, publicClient } = await loadFixture(
+        deployOneYearLockFixture
+      );
+
+      // Send additional ETH to the contract
+      const amount = parseGwei("0.5");
+      const hash = await otherAccount.sendTransaction({
+        to: lock.address,
+        value: amount,
+      });
+      await publicClient.waitForTransactionReceipt({ hash });
+
+      // Fast forward time to unlock
+      await time.increaseTo(unlockTime);
+
+      // Get the owner's balance before withdrawal
+      const ownerBalanceBefore = await publicClient.getBalance({
+        address: owner.account.address,
+      });
+
+      // Owner withdraws all funds
+      const withdrawHash = await lock.write.withdraw();
+      const receipt = await publicClient.waitForTransactionReceipt({ hash: withdrawHash });
+
+      // Calculate gas cost
+      const gasCost = receipt.gasUsed * receipt.effectiveGasPrice;
+
+      // Get the owner's balance after withdrawal
+      const ownerBalanceAfter = await publicClient.getBalance({
+        address: owner.account.address,
+      });
+
+      // Check contract balance is zero
+      const contractBalance = await publicClient.getBalance({
+        address: lock.address,
+      });
+      expect(contractBalance).to.equal(0n);
+
+      // Check owner received the funds (minus gas costs)
+      // The initial locked amount + the additional amount should have been transferred
+      const { lockedAmount } = await loadFixture(deployOneYearLockFixture);
+
+      // When working with BigInts, use BigInt-specific assertions
+      // Instead of using closeTo with numbers, check if within a small range
+      const expectedBalance = ownerBalanceBefore + lockedAmount + amount - gasCost;
+      const difference = expectedBalance > ownerBalanceAfter
+        ? expectedBalance - ownerBalanceAfter
+        : ownerBalanceAfter - expectedBalance;
+
+      // Allow for a small variance (1000 wei)
+      expect(difference <= 1000n).to.be.true;
+    });
+  });
 });
