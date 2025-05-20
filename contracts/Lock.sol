@@ -12,6 +12,10 @@ contract Lock {
 
     constructor(address _owner, uint _unlockTime) payable {
         require(
+            _owner != 0x0000000000000000000000000000000000000000,
+            "Owner must not be zero"
+        );
+        require(
             block.timestamp < _unlockTime,
             "Unlock time should be in the future"
         );
