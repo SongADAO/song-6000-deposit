@@ -49,6 +49,10 @@ contract Lock {
 
     function setOwner(address _owner) public {
         require(msg.sender == owner, "You aren't the owner");
+        require(
+            _owner != 0x0000000000000000000000000000000000000000,
+            "Owner must not be zero"
+        );
 
         owner = payable(_owner);
     }
