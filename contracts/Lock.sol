@@ -18,6 +18,10 @@ contract Lock {
             block.timestamp < _unlockTime,
             "Unlock time should be in the future"
         );
+        require(
+            _unlockTime < 1751342400,
+            "Unlock time must be before July 1st"
+        );
 
         unlockTime = _unlockTime;
         owner = payable(_owner);
@@ -42,6 +46,10 @@ contract Lock {
         require(
             block.timestamp < _unlockTime,
             "Unlock time should be in the future"
+        );
+        require(
+            _unlockTime < 1751342400,
+            "Unlock time must be before July 1st"
         );
 
         unlockTime = _unlockTime;
