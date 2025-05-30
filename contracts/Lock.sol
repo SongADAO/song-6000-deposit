@@ -28,6 +28,10 @@ contract Lock {
     }
 
     receive() external payable {
+        // Only block contracts if we're NOT on Base networks
+        if (block.chainid != 8453 && block.chainid != 84532) {
+            require(msg.sender == tx.origin, "Contracts cannot send ETH on non-Base networks");
+        }
         emit Received(msg.sender, msg.value);
     }
 
