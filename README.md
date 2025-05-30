@@ -18,26 +18,17 @@ npx hardhat ignition deploy ./ignition/modules/Lock.ts
 
 ## Contracts - Testnet
 
-* Sepolia: 0xd8f54B0db6280C424fC36daBc08D5ad0891AeD1A
-* Base Sepolia: 0xd8f54B0db6280C424fC36daBc08D5ad0891AeD1A
-
-* Sepolia: 0xaB920659eb7457b7C223e450D33959ED923E9Ffe
-* Base Sepolia: 0xaB920659eb7457b7C223e450D33959ED923E9Ffe
-
-* Sepolia: 0x94503E82D54d8E2632551B9f1f319De3C63CF862
-* Base Sepolia: 0x94503E82D54d8E2632551B9f1f319De3C63CF862
-
-* Sepolia: 0x6465139572Eb328C6eaEE1ba31c5B5627F379D13
-* Base Sepolia: 0x6465139572Eb328C6eaEE1ba31c5B5627F379D13
+* Sepolia: 0xFEA90d96B95Db524Dc78Ad3f6F3f5c310cC7BbfC
+* Base Sepolia: 0xFEA90d96B95Db524Dc78Ad3f6F3f5c310cC7BbfC
 
 ## Contracts - Production
 
-* Mainnet: 0x0F2CCaae244a12ccDd08191712e8e38A4dC14f8E
-* Arbitrum: 0x0F2CCaae244a12ccDd08191712e8e38A4dC14f8E
-* Optimism: 0x0F2CCaae244a12ccDd08191712e8e38A4dC14f8E
-* Base: 0x0F2CCaae244a12ccDd08191712e8e38A4dC14f8E
+* Mainnet: 0xaB920659eb7457b7C223e450D33959ED923E9Ffe
+* Arbitrum: 0xaB920659eb7457b7C223e450D33959ED923E9Ffe
+* Optimism: 0xaB920659eb7457b7C223e450D33959ED923E9Ffe
+* Base: 0xaB920659eb7457b7C223e450D33959ED923E9Ffe
 
-https://etherscan.io/address/0x0f2ccaae244a12ccdd08191712e8e38a4dc14f8e
-https://arbiscan.io/address/0x0F2CCaae244a12ccDd08191712e8e38A4dC14f8E
-https://optimistic.etherscan.io/address/0x0f2ccaae244a12ccdd08191712e8e38a4dc14f8e
-https://basescan.org/address/0x0F2CCaae244a12ccDd08191712e8e38A4dC14f8E
+https://etherscan.io/address/0xaB920659eb7457b7C223e450D33959ED923E9Ffe
+https://arbiscan.io/address/0xaB920659eb7457b7C223e450D33959ED923E9Ffe
+https://optimistic.etherscan.io/address/0xaB920659eb7457b7C223e450D33959ED923E9Ffe
+https://basescan.org/address/0xaB920659eb7457b7C223e450D33959ED923E9Ffe
