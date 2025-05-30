@@ -12,14 +12,20 @@ describe("Lock", function () {
   // and reset Hardhat Network to that snapshot in every test.
   async function deployOneYearLockFixture() {
     const ONE_DAY_FROM_NOW = 24 * 3600;
+    const TWELVE_HOURS_FROM_NOW = 12 * 3600;
 
     const lockedAmount = parseGwei("1");
     const unlockTime = BigInt((await time.latest()) + ONE_DAY_FROM_NOW);
+    const depositDeadline = BigInt((await time.latest()) + TWELVE_HOURS_FROM_NOW);
 
     // Contracts are deployed using the first signer/account by default
     const [owner, otherAccount] = await hre.viem.getWalletClients();
 
-    const lock = await hre.viem.deployContract("Lock", [getAddress(owner.account.address), unlockTime], {
+    const lock = await hre.viem.deployContract("Lock", [
+      getAddress(owner.account.address),
+      unlockTime,
+      depositDeadline
+    ], {
       value: lockedAmount,
     });
 
@@ -28,6 +34,7 @@ describe("Lock", function () {
     return {
       lock,
       unlockTime,
+      depositDeadline,
       lockedAmount,
       owner,
       otherAccount,
@@ -40,6 +47,12 @@ describe("Lock", function () {
       const { lock, unlockTime } = await loadFixture(deployOneYearLockFixture);
 
       expect(await lock.read.unlockTime()).to.equal(unlockTime);
+    });
+
+    it("Should set the right depositDeadline", async function () {
+      const { lock, depositDeadline } = await loadFixture(deployOneYearLockFixture);
+
+      expect(await lock.read.depositDeadline()).to.equal(depositDeadline);
     });
 
     it("Should set the right owner", async function () {
@@ -65,13 +78,53 @@ describe("Lock", function () {
     it("Should fail if the unlockTime is not in the future", async function () {
       const [owner, otherAccount] = await hre.viem.getWalletClients();
 
-      // We don't use the fixture here because we want a different deployment
       const latestTime = BigInt(await time.latest());
+      const futureDepositDeadline = latestTime + BigInt(3600); // 1 hour from now
+
       await expect(
-        hre.viem.deployContract("Lock", [getAddress(owner.account.address), latestTime], {
+        hre.viem.deployContract("Lock", [
+          getAddress(owner.account.address),
+          latestTime,
+          futureDepositDeadline
+        ], {
           value: 1n,
         })
       ).to.be.rejectedWith("Unlock time should be in the future");
+    });
+
+    it("Should fail if the depositDeadline is not in the future", async function () {
+      const [owner, otherAccount] = await hre.viem.getWalletClients();
+
+      const latestTime = BigInt(await time.latest());
+      const futureUnlockTime = latestTime + BigInt(86400); // 1 day from now
+
+      await expect(
+        hre.viem.deployContract("Lock", [
+          getAddress(owner.account.address),
+          futureUnlockTime,
+          latestTime
+        ], {
+          value: 1n,
+        })
+      ).to.be.rejectedWith("Deposit deadline should be in the future");
+    });
+
+    it("Should fail if depositDeadline is after unlockTime", async function () {
+      const [owner, otherAccount] = await hre.viem.getWalletClients();
+
+      const latestTime = BigInt(await time.latest());
+      const unlockTime = latestTime + BigInt(3600); // 1 hour from now
+      const depositDeadline = latestTime + BigInt(7200); // 2 hours from now
+
+      await expect(
+        hre.viem.deployContract("Lock", [
+          getAddress(owner.account.address),
+          unlockTime,
+          depositDeadline
+        ], {
+          value: 1n,
+        })
+      ).to.be.rejectedWith("Deposit deadline must be before or equal to unlock time");
     });
   });
 
@@ -180,6 +233,54 @@ describe("Lock", function () {
     });
   });
 
+  describe("Set Deposit Deadline", function () {
+    describe("Validations", function () {
+      it("Should revert if called from another account", async function () {
+        const { lock, depositDeadline, otherAccount } = await loadFixture(
+          deployOneYearLockFixture
+        );
+
+        // Try to set deposit deadline from another account
+        const lockAsOtherAccount = await hre.viem.getContractAt(
+          "Lock",
+          lock.address,
+          { client: { wallet: otherAccount } }
+        );
+        await expect(lockAsOtherAccount.write.setDepositDeadline([depositDeadline + BigInt(60)]))
+          .to.be.rejectedWith("You aren't the owner");
+      });
+
+      it("Should revert if new deadline is after unlock time", async function () {
+        const { lock, unlockTime } = await loadFixture(
+          deployOneYearLockFixture
+        );
+
+        await expect(lock.write.setDepositDeadline([unlockTime + BigInt(60)]))
+          .to.be.rejectedWith("Deposit deadline must be before or equal to unlock time");
+      });
+
+      it("Should revert if new deadline is not in the future", async function () {
+        const { lock } = await loadFixture(deployOneYearLockFixture);
+
+        const pastTime = BigInt(await time.latest()) - BigInt(3600);
+        await expect(lock.write.setDepositDeadline([pastTime]))
+          .to.be.rejectedWith("Deposit deadline should be in the future");
+      });
+
+      it("Should update the deposit deadline if called by the owner with valid time", async function () {
+        const { lock, unlockTime } = await loadFixture(
+          deployOneYearLockFixture
+        );
+
+        // Set a new deposit deadline (equal to unlock time)
+        await lock.write.setDepositDeadline([unlockTime]);
+
+        // Check if the deposit deadline was updated
+        expect(await lock.read.depositDeadline()).to.equal(unlockTime);
+      });
+    });
+  });
+
   describe("Set Owner", function () {
     describe("Validations", function () {
       it("Should revert if called from another account", async function () {
@@ -253,12 +354,12 @@ describe("Lock", function () {
   });
 
   describe("Receive function", function () {
-    it("Should emit Received event when contract receives Ether", async function () {
+    it("Should emit Received event when contract receives Ether before deposit deadline", async function () {
       const { lock, otherAccount, publicClient } = await loadFixture(
         deployOneYearLockFixture
       );
 
-      // Send ETH directly to the contract
+      // Send ETH directly to the contract before deposit deadline
       const amount = parseGwei("0.5");
       const hash = await otherAccount.sendTransaction({
         to: lock.address,
@@ -275,7 +376,25 @@ describe("Lock", function () {
       expect(receivedEvents[0].args.amount).to.equal(amount);
     });
 
-    it("Should increase contract balance when receiving Ether", async function () {
+    it("Should revert when trying to send Ether after deposit deadline", async function () {
+      const { lock, depositDeadline, otherAccount } = await loadFixture(
+        deployOneYearLockFixture
+      );
+
+      // Fast forward time past the deposit deadline
+      await time.increaseTo(depositDeadline + BigInt(1));
+
+      // Try to send ETH after deposit deadline
+      const amount = parseGwei("0.5");
+      await expect(
+        otherAccount.sendTransaction({
+          to: lock.address,
+          value: amount,
+        })
+      ).to.be.rejectedWith("Deposits are no longer allowed");
+    });
+
+    it("Should increase contract balance when receiving Ether before deadline", async function () {
       const { lock, otherAccount, publicClient, lockedAmount } = await loadFixture(
         deployOneYearLockFixture
       );
@@ -300,7 +419,7 @@ describe("Lock", function () {
       expect(newBalance).to.equal(initialBalance + amount);
     });
 
-    it("Should allow receiving Ether from multiple accounts", async function () {
+    it("Should allow receiving Ether from multiple accounts before deadline", async function () {
       const { lock, owner, otherAccount, publicClient } = await loadFixture(
         deployOneYearLockFixture
       );
@@ -356,18 +475,29 @@ describe("Lock", function () {
       expect(newBalance).to.equal(initialBalance + amount1 + amount2);
     });
 
-    it("Should work with withdraw function", async function () {
-      const { lock, unlockTime, owner, otherAccount, publicClient } = await loadFixture(
+    it("Should work with withdraw function after deposit deadline has passed", async function () {
+      const { lock, unlockTime, depositDeadline, owner, otherAccount, publicClient } = await loadFixture(
         deployOneYearLockFixture
       );
 
-      // Send additional ETH to the contract
+      // Send additional ETH to the contract before deposit deadline
       const amount = parseGwei("0.5");
       const hash = await otherAccount.sendTransaction({
         to: lock.address,
         value: amount,
       });
       await publicClient.waitForTransactionReceipt({ hash });
+
+      // Fast forward time past deposit deadline but before unlock time
+      await time.increaseTo(depositDeadline + BigInt(3600));
+
+      // Verify deposits are now blocked
+      await expect(
+        otherAccount.sendTransaction({
+          to: lock.address,
+          value: parseGwei("0.1"),
+        })
+      ).to.be.rejectedWith("Deposits are no longer allowed");
 
       // Fast forward time to unlock
       await time.increaseTo(unlockTime);
