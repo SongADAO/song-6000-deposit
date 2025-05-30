@@ -2,12 +2,12 @@
   "name": "song-6000-deposit",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "deploy-arbitrum": "hardhat ignition deploy ./ignition/modules/Lock.ts --network arbitrum --verify",
+    "deploy-arbitrumOne": "hardhat ignition deploy ./ignition/modules/Lock.ts --network arbitrumOne --verify",
     "deploy-base": "hardhat ignition deploy ./ignition/modules/Lock.ts --network base --verify",
     "deploy-baseSepolia": "hardhat ignition deploy ./ignition/modules/Lock.ts --network baseSepolia --verify",
     "deploy-localhost": "hardhat ignition deploy ./ignition/modules/Lock.ts --network localhost",
     "deploy-mainnet": "hardhat ignition deploy ./ignition/modules/Lock.ts --network mainnet --verify",
-    "deploy-optimism": "hardhat ignition deploy ./ignition/modules/Lock.ts --network optimism --verify",
+    "deploy-optimisticEthereum": "hardhat ignition deploy ./ignition/modules/Lock.ts --network optimisticEthereum --verify",
     "deploy-sepolia": "hardhat ignition deploy ./ignition/modules/Lock.ts --network sepolia --verify"
   },
   "devDependencies": {

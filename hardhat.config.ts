@@ -7,20 +7,68 @@ dotenv.config();
 const config: HardhatUserConfig = {
   etherscan: {
     apiKey: {
-      arbitrum: process.env.ETHERSCAN_API_KEY ?? '',
-      base: process.env.ETHERSCAN_API_KEY ?? '',
-      baseSepolia: process.env.BASE_ETHERSCAN_API_KEY ?? '',
+      // Mainnet networks
       mainnet: process.env.ETHERSCAN_API_KEY ?? '',
-      optimism: process.env.ETHERSCAN_API_KEY ?? '',
+      arbitrumOne: process.env.ARBISCAN_API_KEY ?? '',
+      base: process.env.BASESCAN_API_KEY ?? '',
+      optimisticEthereum: process.env.OPTIMISM_API_KEY ?? '',
+
+      // Testnet networks
       sepolia: process.env.ETHERSCAN_API_KEY ?? '',
+      arbitrumSepolia: process.env.ARBISCAN_API_KEY ?? '',
+      baseSepolia: process.env.BASESCAN_API_KEY ?? '',
+      optimismSepolia: process.env.OPTIMISM_API_KEY ?? '',
     },
     customChains: [
+      // Mainnet chains
+      {
+        network: "arbitrumOne",
+        chainId: 42161,
+        urls: {
+          apiURL: "https://api.arbiscan.io/api",
+          browserURL: "https://arbiscan.io"
+        }
+      },
+      {
+        network: "base",
+        chainId: 8453,
+        urls: {
+          apiURL: "https://api.basescan.org/api",
+          browserURL: "https://basescan.org"
+        }
+      },
+      {
+        network: "optimisticEthereum",
+        chainId: 10,
+        urls: {
+          apiURL: "https://api-optimistic.etherscan.io/api",
+          browserURL: "https://optimistic.etherscan.io"
+        }
+      },
+
+      // Testnet chains
       {
         network: "baseSepolia",
         chainId: 84532,
         urls: {
           apiURL: "https://api-sepolia.basescan.org/api",
           browserURL: "https://sepolia.basescan.org"
+        }
+      },
+      {
+        network: "arbitrumSepolia",
+        chainId: 421614,
+        urls: {
+          apiURL: "https://api-sepolia.arbiscan.io/api",
+          browserURL: "https://sepolia.arbiscan.io"
+        }
+      },
+      {
+        network: "optimismSepolia",
+        chainId: 11155420,
+        urls: {
+          apiURL: "https://api-sepolia-optimistic.etherscan.io/api",
+          browserURL: "https://sepolia-optimism.etherscan.io"
         }
       }
     ]
@@ -42,15 +90,15 @@ const config: HardhatUserConfig = {
       from: process.env.MAINNET_FROM, // want this contract owner
       url: process.env.MAINNET_URL,
     },
-    arbitrum: {
+    arbitrumOne: {
       accounts: [process.env.MAINNET_PRIVATE_KEY ?? ''],
       from: process.env.MAINNET_FROM, // want this contract owner
-      url: process.env.ARBITRUM_SEPOLIA_URL,
+      url: process.env.ARBITRUM_URL,
     },
-    optimism: {
+    optimisticEthereum: {
       accounts: [process.env.MAINNET_PRIVATE_KEY ?? ''],
       from: process.env.MAINNET_FROM, // want this contract owner
-      url: process.env.OPTIMISM_SEPOLIA_URL,
+      url: process.env.OPTIMISM_URL,
     },
     base: {
       accounts: [process.env.MAINNET_PRIVATE_KEY ?? ''],
