@@ -32,7 +32,12 @@ npx hardhat ignition deploy ./ignition/modules/Lock.ts
 
 ## Contracts - Production
 
-* Mainnet:
-* Arbitrum:
-* Optimism:
-* Base:
+* Mainnet: 0x0F2CCaae244a12ccDd08191712e8e38A4dC14f8E
+* Arbitrum: 0x0F2CCaae244a12ccDd08191712e8e38A4dC14f8E
+* Optimism: 0x0F2CCaae244a12ccDd08191712e8e38A4dC14f8E
+* Base: 0x0F2CCaae244a12ccDd08191712e8e38A4dC14f8E
+
+https://etherscan.io/address/0x0f2ccaae244a12ccdd08191712e8e38a4dc14f8e
+https://arbiscan.io/address/0x0F2CCaae244a12ccDd08191712e8e38A4dC14f8E
+https://optimistic.etherscan.io/address/0x0f2ccaae244a12ccdd08191712e8e38a4dc14f8e
+https://basescan.org/address/0x0F2CCaae244a12ccDd08191712e8e38A4dC14f8E
