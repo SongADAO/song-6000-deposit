@@ -11,10 +11,10 @@ describe("Lock", function () {
   // We use loadFixture to run this setup once, snapshot that state,
   // and reset Hardhat Network to that snapshot in every test.
   async function deployOneYearLockFixture() {
-    const ONE_YEAR_IN_SECS = 365 * 24 * 60 * 60;
+    const ONE_DAY_FROM_NOW = 24 * 3600;
 
     const lockedAmount = parseGwei("1");
-    const unlockTime = BigInt((await time.latest()) + ONE_YEAR_IN_SECS);
+    const unlockTime = BigInt((await time.latest()) + ONE_DAY_FROM_NOW);
 
     // Contracts are deployed using the first signer/account by default
     const [owner, otherAccount] = await hre.viem.getWalletClients();
@@ -137,11 +137,11 @@ describe("Lock", function () {
   describe("Set Unlock Time", function () {
     describe("Validations", function () {
       it("Should revert if called before the unlock time", async function () {
-        const { lock } = await loadFixture(deployOneYearLockFixture);
+        const { lock, unlockTime } = await loadFixture(deployOneYearLockFixture);
 
         // Try to set a new unlock time before the current unlock time has passed
-        await expect(lock.write.setUnlockTime([BigInt((await time.latest()) + 2 * 365 * 24 * 60 * 60)]))
-          .to.be.rejectedWith("You can't change time yet");
+        await expect(lock.write.setUnlockTime([unlockTime - BigInt(1)]))
+          .to.be.rejectedWith("Cannot decrease lock time");
       });
 
       it("Should revert if called from another account", async function () {
@@ -171,7 +171,7 @@ describe("Lock", function () {
         await time.increaseTo(unlockTime);
 
         // Set a new unlock time (one more year)
-        const newUnlockTime = unlockTime + BigInt(365 * 24 * 60 * 60);
+        const newUnlockTime = unlockTime + BigInt(60);
         await lock.write.setUnlockTime([newUnlockTime]);
 
         // Check if the unlock time was updated
