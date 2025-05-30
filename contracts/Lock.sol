@@ -45,8 +45,8 @@ contract Lock {
     }
 
     function setUnlockTime(uint _unlockTime) public {
-        require(block.timestamp >= unlockTime, "You can't change time yet");
         require(msg.sender == owner, "You aren't the owner");
+        require(unlockTime < _unlockTime, "Cannot decrease lock time");
         require(
             block.timestamp < _unlockTime,
             "Unlock time should be in the future"
