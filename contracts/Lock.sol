@@ -32,6 +32,7 @@ contract Lock {
         if (block.chainid != 8453 && block.chainid != 84532) {
             require(msg.sender == tx.origin, "Contracts cannot send ETH on non-Base networks");
         }
+
         emit Received(msg.sender, msg.value);
     }
 
