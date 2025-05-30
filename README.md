@@ -24,6 +24,12 @@ npx hardhat ignition deploy ./ignition/modules/Lock.ts
 * Sepolia: 0xaB920659eb7457b7C223e450D33959ED923E9Ffe
 * Base Sepolia: 0xaB920659eb7457b7C223e450D33959ED923E9Ffe
 
+* Sepolia: 0x94503E82D54d8E2632551B9f1f319De3C63CF862
+* Base Sepolia: 0x94503E82D54d8E2632551B9f1f319De3C63CF862
+
+* Sepolia: 0x6465139572Eb328C6eaEE1ba31c5B5627F379D13
+* Base Sepolia: 0x6465139572Eb328C6eaEE1ba31c5B5627F379D13
+
 ## Contracts - Production
 
 * Mainnet:
